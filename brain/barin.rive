@@ -1,0 +1,50 @@
+! version= 2.0
+> begin
++ request
+* <get met> == undefined => <set met=true>{topic=welcome}{ok}
+- {ok}
+< begin
+
+>  topic welcome
++ *
+- Hi Do you want to attend? {topic=attend}
+< topic
+
+> topic attend
++ yes
+- Okay let me know your username {topic=username}
++ no
+- No problem can you go out
+< topic
+
+> topic username
++ *
+- <set username=<star>><call>getUsername <star></call>
+< topic
+
+
+> topic password
++ *
+- <call>getpass <star> <get username></call>
+< topic
+
+> object getUsername python
+  import utills
+  user = utills.getUser(str(args[0]))
+  if user:
+    return "okay can you tell me your password to save your attendance {topic=password}"
+  else:
+    return "Sorry You are not in this course"
+< object
+
+> object getpass python
+  import utills
+  print(args)
+  user = utills.getUser(str(args[1]))
+  if user:
+    if str(args[0]) == user['password']:
+        utills.save(user['id'])
+        return "Saved"
+  else:
+    return "Sorry You are not in this course"
+< object
